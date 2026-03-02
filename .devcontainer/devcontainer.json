@@ -1,0 +1,22 @@
+// {
+//   "name": "Playwright Testing",
+//   "image": "mcr.microsoft.com/playwright:v1.45.1-jammy",
+//   "forwardPorts": [9323],
+//   "postCreateCommand": "npm install",
+//   "customizations": {
+//     "vscode": {
+//     "extensions": [
+//       "GitHub.github-vscode-theme",
+//       "esbenp.prettier-vscode",
+//       "dbaeumer.vscode-eslint",
+//       "ritwickdey.LiveServer",
+//       "stylelint.vscode-stylelint",
+//       "ms-playwright.playwright"
+//       // Additional Extensions Here]
+//       ]
+//     }
+//   },
+//   "onCreateCommand": "echo PS1='\"$ \"' >> ~/.bashrc", //Set Terminal Prompt to $
+//   "postAttachCommand": "git pull --all"  
+// }
+// DevContainer Reference: https://code.visualstudio.com/docs/remote/devcontainerjson-reference
