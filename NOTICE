@@ -1,0 +1,52 @@
+Copyright 2024 LinkedIn Corporation
+All Rights Reserved.
+
+Licensed under the LinkedIn Learning Exercise File License (the "License").
+See LICENSE in the project root for license information.
+
+ATTRIBUTIONS:
+
+-------------------  
+**fsevents**  
+https://github.com/moment/fsevents  
+License: MIT  
+https://opensource.org/licenses/MIT  
+-------------------  
+**dotenv**  
+https://github.com/motdotla/dotenv  
+License: BSD-2-Clause  
+https://opensource.org/licenses/BSD-2-Clause  
+-------------------  
+**undici-types**  
+https://github.com/nodejs/undici  
+License: MIT  
+https://opensource.org/licenses/MIT  
+-------------------  
+**playwright-core**  
+https://github.com/microsoft/playwright  
+License: Apache-2.0  
+http://www.apache.org/licenses/LICENSE-2.0  
+-------------------  
+**@playwright/test**  
+https://github.com/microsoft/playwright  
+License: Apache-2.0  
+http://www.apache.org/licenses/LICENSE-2.0  
+-------------------  
+**playwright**  
+https://github.com/microsoft/playwright  
+License: Apache-2.0  
+http://www.apache.org/licenses/LICENSE-2.0  
+-------------------  
+**@types/node**  
+https://github.com/DefinitelyTyped/DefinitelyTyped  
+License: MIT  
+https://opensource.org/licenses/MIT  
+-------------------  
+
+
+Please note, this project may automatically load third party code from external 
+repositories (for example, NPM modules, Composer packages, or other dependencies). 
+If so, such third party code may be subject to other license terms than as set 
+forth above. In addition, such third party code may also depend on and load 
+multiple tiers of dependencies. Please review the applicable licenses of the 
+additional dependencies.
