@@ -2,7 +2,9 @@ import { test, expect } from "@playwright/test";
 
 test.describe("Home page with no authentication", () => {
   test.beforeEach(async ({ page }) => {
+    const productsResponse = page.waitForResponse(r => r.url().includes('/products') && r.request().method() === 'GET');
     await page.goto("https://practicesoftwaretesting.com/");
+    await productsResponse;
     // THE FIX: Wait for a card that actually contains a product name!
     // This forces Playwright to ignore the empty grey skeleton loaders.
     const realProductCard = page.locator(".col-md-9 a.card", {has: page.locator('[data-test="product-name"]')}).first();
@@ -32,8 +34,7 @@ test.describe("Home page with no authentication", () => {
 
   test("Check search functionality", async ({ page }) => {
     const productGrid = page.locator(".col-md-9");
-    //await expect(productGrid.getByRole("link")).toHaveCount(9);
-    await expect(productGrid.locator("a.card")).toHaveCount(9);
+    await expect(productGrid.locator("a.card", { has: page.locator('[data-test="product-name"]') })).toHaveCount(9);
   });
 
   test("Check search functionality and search result", async ({ page }) => {
@@ -67,8 +68,10 @@ test.describe("Home page with no authentication", () => {
 test.describe("Home page with authentication", () => {
   test.use({ storageState: ".auth/admin.json" });
   test.beforeEach(async ({ page }) => {
+    const productsResponse = page.waitForResponse(r => r.url().includes('/products') && r.request().method() === 'GET');
     // 1. Navigate to the page
     await page.goto("https://practicesoftwaretesting.com/");
+    await productsResponse;
 
     // 2. THE AUTH BARRICADE: Wait for Angular to process the token and update the header
     await expect(page.locator('[data-test="nav-sign-in"]')).toBeHidden();

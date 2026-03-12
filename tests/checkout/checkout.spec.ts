@@ -3,7 +3,9 @@ import { test, expect } from "@playwright/test";
 test.describe("Checkout tests", () => {
   test.use({ storageState: ".auth/admin.json" });
   test.beforeEach(async ({ page }) => {
+    const productsResponse = page.waitForResponse(r => r.url().includes('/products') && r.request().method() === 'GET');
     await page.goto("https://practicesoftwaretesting.com/");
+    await productsResponse;
     await page.waitForLoadState("networkidle");
     await page.locator("[data-test='nav-home']").click();
     const realProductCard = page
