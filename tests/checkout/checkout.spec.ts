@@ -1,10 +1,11 @@
 import { test, expect } from "@playwright/test";
+import { randomState } from "../../lib/helpers/states";
 
 test.describe("Checkout tests", () => {
   test.use({ storageState: ".auth/admin.json" });
   test.beforeEach(async ({ page }) => {
     const productsResponse = page.waitForResponse(r => r.url().includes('/products') && r.request().method() === 'GET');
-    await page.goto("https://practicesoftwaretesting.com/");
+    await page.goto(process.env.BASE_URL);
     await productsResponse;
     await page.waitForLoadState("networkidle");
     await page.locator("[data-test='nav-home']").click();
@@ -35,7 +36,7 @@ test.describe("Checkout tests", () => {
     // Fill in billing/shipping address
     await page.getByTestId("street").fill("123 Testing Address");
     await page.getByTestId("city").fill("Saigon");
-    await page.getByTestId("state").fill("HoChiMinh");
+    await page.getByTestId("state").fill(randomState());
     await page.getByTestId("country").fill("Vietnam");
     await page.getByTestId("postal_code").fill("70000");
     await page.getByTestId("proceed-3").click(); // Go to step 4 (Payment)

@@ -1,12 +1,12 @@
-import { defineConfig, devices } from "@playwright/test";
+import { defineConfig, devices, expect } from "@playwright/test";
 
 /**
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
  */
-import dotenv from 'dotenv';
-import path from 'path';
-dotenv.config({ path: path.resolve(__dirname, '.env') });
+import dotenv from "dotenv";
+import path from "path";
+dotenv.config({ path: path.resolve(__dirname, ".env") });
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -90,4 +90,51 @@ export default defineConfig({
   //   url: 'http://127.0.0.1:3000',
   //   reuseExistingServer: !process.env.CI,
   // },
+});
+
+// Custom assertions
+expect.extend({
+  toBeNumber(received: any) {
+    const pass = typeof received === "number";
+    return {
+      pass,
+      message: () =>
+        pass
+          ? `Expected '${received}' NOT to be a number\n`
+          : `toBeNumber() assertion failed.\nYou expected '${received}' to be a number but it's a ${typeof received}\n`,
+    };
+  },
+
+  toBeString(received: any) {
+    const pass = typeof received === "string";
+    return {
+      pass,
+      message: () =>
+        pass
+          ? `Expected '${received}' NOT to be a string\n`
+          : `toBeString() assertion failed.\nYou expected '${received}' to be a string but it's a ${typeof received}\n`,
+    };
+  },
+
+  toBeBoolean(received: any) {
+    const pass = typeof received === "boolean";
+    return {
+      pass,
+      message: () =>
+        pass
+          ? `Expected '${received}' NOT to be a boolean\n`
+          : `toBeBoolean() assertion failed.\nYou expected '${received}' to be a boolean but it's a ${typeof received}\n`,
+    };
+  },
+
+  toBeOneOfValues(received: any, array: any[]) {
+    const pass = array.includes(received);
+    return {
+      pass,
+      message: () =>
+        pass
+          ? `Expected '${received}' NOT to be one of [${array.join(", ")}]\n`
+          : `toBeOneOfValues() assertion failed.\nYou expected [${array.join(", ")}] to include '${received}'\n`,
+    };
+  },
 });

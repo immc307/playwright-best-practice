@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "baseUrl": ".",
+    "paths": {
+      "@datafactory/*": ["lib/datafactory/*"],
+      "@helpers/*": ["lib/helpers/*"],
+      "@pages/*": ["lib/pages/*"],
+      "@fixtures/*": ["lib/fixtures/*"]
+    }
+  }
+}

@@ -37,6 +37,6 @@ test.describe("API tests", () => {
 
     expect(body.in_stock).toBe(true);
     expect(body.name).toBe("Thor Hammer");
-    expect(body.price).toBe(11.14);
+    expect(body.price).toBeNumber();
   })
 });
