@@ -1,12 +1,12 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("API tests", () => {
-  const apiUrl = "https://api.practicesoftwaretesting.com";
+  const apiUrl = process.env.API_URL;
   test("POST/api/login", async ({ request }) => {
     const postResponse = await request.post(apiUrl + "/users/login", {
       data: {
-        email: "admin@practicesoftwaretesting.com",
-        password: "welcome01",
+        email: "immc307@gmail.com",
+        password: "Playwright30&",
       },
     });
     expect(postResponse.status()).toBe(200);
@@ -23,7 +23,6 @@ test.describe("API tests", () => {
   });
 
   test("GET/products/{id}", async ({ request }) => {
-    const apiUrl = "https://api.practicesoftwaretesting.com";
     const getProductResponse = await request.get(
       apiUrl + "/products/search?q=thor%20hammer",
     );

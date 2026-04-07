@@ -1,7 +1,7 @@
 {
-  "name": "learning-playwright-5911873",
+  "name": "playwright-practice",
   "version": "1.0.0",
-  "description": "This is the repository for the LinkedIn Learning course `learning-playwright`. The full course is available from [LinkedIn Learning][lil-course-url].",
+  "description": "Personal Playwright E2E test automation project by MC307.",
   "main": "index.js",
   "scripts": {
     "test": "npx playwright test",
@@ -14,7 +14,7 @@
     "test:update-screenshots": "npx playwright test --update-snapshots"
   },
   "keywords": [],
-  "author": "",
+  "author": "MC307",
   "license": "ISC",
   "devDependencies": {
     "@playwright/test": "^1.47.2",

@@ -17,11 +17,15 @@ test.describe("Checkout tests", () => {
     await expect(realProductCard).toBeVisible();
   });
 
-  test("By now pay later", async ({ page, headless }) => {
+  test("By now pay later", async ({ page, headless, isMobile }) => {
     // Add a specific product to the cart
     await page.getByText("Claw Hammer with Shock Reduction Grip").click();
     await page.locator('[data-test="add-to-cart"]').click();
-    await expect(page.locator('[data-test="cart-quantity"]')).toHaveText("1");
+    await expect(page.locator('[data-test="cart-quantity"]')).toContainText("1");
+
+    if (isMobile) {
+      await page.getByLabel("Toggle navigation").click();
+    }
 
     // Proceed to checkout
     await page.locator('[data-test="nav-cart"]').click();

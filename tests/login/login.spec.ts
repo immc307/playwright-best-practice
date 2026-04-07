@@ -1,8 +1,11 @@
 import { test, expect } from "@fixtures/base.fixture";
 import { registerUser } from "@datafactory/register";
 
-test("Login with valid credentials", async ({ page }) => {
-  await page.goto(process.env.BASE_URL);
+test("Login with valid credentials", async ({ page, isMobile }) => {
+  await page.goto("/");
+  if (isMobile) {
+    await page.getByLabel("Toggle navigation").click();
+  }
   await page.locator('[data-test="nav-sign-in"]').click();
   await page
     .locator('[data-test="email"]')

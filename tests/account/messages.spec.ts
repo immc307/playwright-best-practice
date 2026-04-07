@@ -1,10 +1,16 @@
 import { LoginPage } from "@pages/login/login.page";
 import { registerUser } from "@datafactory/register";
-import { test, expect } from "@playwright/test";
+import { test, expect } from "@fixtures/base.fixture";
 import { createMessage } from "@datafactory/messages";
-import { MessagePage } from "@pages/account/messages.page";
+import { MessagesPage } from "@pages/account/messages.page";
 
-test("Customer reply to a message", async ({ context, page }) => {
+test("Customer reply to a message", async ({ 
+  context, 
+  loginPage, 
+  messagesPage,
+  contactPage,
+  accountPage
+}) => {
   const timestamp = Date.now();
   const customerEmail = `new_user_${timestamp}@test.com`;
   const customerPassword = `P@ssword_${Date.now()}`;
@@ -14,13 +20,10 @@ test("Customer reply to a message", async ({ context, page }) => {
   const messageUserAuthFile = ".auth/messageUserAuthFile.json";
 
   await test.step("Create new user", async () => {
-    const loginPage = new LoginPage(page);
     await loginPage.goto();
     await registerUser(customerEmail, customerPassword);
     await loginPage.login(customerEmail, customerPassword);
-    await expect(page.locator('[data-test="nav-menu"]')).toContainText(
-      "Minh Cao",
-    );
+    await expect(accountPage.navMenu).toContainText("Minh Cao");
 
     await context.storageState({ path: messageUserAuthFile });
   });
@@ -35,16 +38,15 @@ test("Customer reply to a message", async ({ context, page }) => {
   });
 
   await test.step("Reply and validate message", async () => {
-    const messagePage = new MessagePage(page);
-    await messagePage.goto();
-    await expect(messagePage.table).toContainText(message.substring(0, 25));
-    await expect(messagePage.table).toContainText(dropdownOption);
-    await messagePage.firstDetailLink.click();
-    await expect(messagePage.messageList).toContainText(message);
+    await messagesPage.goto();
+    await expect(messagesPage.table).toContainText(message.substring(0, 25));
+    await expect(messagesPage.table).toContainText(dropdownOption);
+    await messagesPage.firstDetailLink.click();
+    await expect(messagesPage.messageList).toContainText(message);
 
     const replyMessage = "This is reply message";
-    await messagePage.replyInput.fill(replyMessage);
-    await messagePage.replyButton.click();
-    await expect(messagePage.replyList).toContainText(replyMessage);
+    await messagesPage.replyInput.fill(replyMessage);
+    await messagesPage.replyButton.click();
+    await expect(messagesPage.replyList).toContainText(replyMessage);
   });
 });

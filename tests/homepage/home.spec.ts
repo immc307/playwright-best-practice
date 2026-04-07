@@ -2,20 +2,26 @@ import { test, expect } from "@playwright/test";
 
 test.describe("Home page with no authentication", () => {
   test.beforeEach(async ({ page }) => {
-    const productsResponse = page.waitForResponse(r => r.url().includes('/products') && r.request().method() === 'GET');
-    await page.goto("https://practicesoftwaretesting.com/");
+    const productsResponse = page.waitForResponse(
+      (r) => r.url().includes("/products") && r.request().method() === "GET",
+    );
+    await page.goto("/");
     await productsResponse;
     // THE FIX: Wait for a card that actually contains a product name!
     // This forces Playwright to ignore the empty grey skeleton loaders.
-    const realProductCard = page.locator(".col-md-9 a.card", {has: page.locator('[data-test="product-name"]')}).first();
+    const realProductCard = page
+      .locator(".col-md-9 a.card", {
+        has: page.locator('[data-test="product-name"]'),
+      })
+      .first();
     await expect(realProductCard).toBeVisible();
   });
 
-  test("Visual test without authentication", async ({page}) => {
-    //await page.waitForLoadState("networkidle");
+  test("Visual test without authentication", async ({ page }) => {
+    await page.waitForLoadState("networkidle");
     await expect(page).toHaveScreenshot("home-page-no-auth.png", {
-      mask: [page.locator('[data-test="nav-sign-in"]')], 
-      maskColor: "rgb(255 0 153 / 20%)"
+      mask: [page.locator('[data-test="nav-sign-in"]')],
+      maskColor: "rgb(255 0 153 / 20%)",
     });
   });
 
@@ -34,11 +40,21 @@ test.describe("Home page with no authentication", () => {
 
   test("Check search functionality", async ({ page }) => {
     const productGrid = page.locator(".col-md-9");
-    await expect(productGrid.locator("a.card", { has: page.locator('[data-test="product-name"]') })).toHaveCount(9);
+    await expect(
+      productGrid.locator("a.card", {
+        has: page.locator('[data-test="product-name"]'),
+      }),
+    ).toHaveCount(9);
   });
 
-  test("Check search functionality and search result", async ({ page }) => {
+  test("Check search functionality and search result", async ({
+    page,
+    isMobile,
+  }) => {
     // Search for Thor Hammer and check the result
+    if (isMobile === true) {
+      await page.getByRole("button", { name: "Filters" }).click();
+    }
     await page.locator('[data-test="search-query"]').fill("Thor Hammer");
     await page.locator('[data-test="search-submit"]').click();
     await expect(page.locator('[data-test="search-term"]')).toHaveText(
@@ -63,14 +79,31 @@ test.describe("Home page with no authentication", () => {
       await expect(productName).toContainText("Thor Hammer");
     }
   });
+
+  test("Check for inputs without labels", async ({ page }) => {
+    const inputsWithoutLabels = await page.evaluate(() => {
+      // Find inputs that are missing labels on page
+      return Array.from(document.querySelectorAll("input"))
+        .filter((input) => !document.querySelector(`label[for="${input.id}"]`))
+        .map((input) => input.outerHTML);
+    });
+
+    expect(
+      inputsWithoutLabels.length,
+      `Found ${inputsWithoutLabels.length} input(s) missing labels:\n` +
+        inputsWithoutLabels.map((html, i) => `  ${i + 1}. ${html}`).join("\n"),
+    ).toBe(0);
+  });
 });
 
 test.describe("Home page with authentication", () => {
   test.use({ storageState: ".auth/admin.json" });
   test.beforeEach(async ({ page }) => {
-    const productsResponse = page.waitForResponse(r => r.url().includes('/products') && r.request().method() === 'GET');
+    const productsResponse = page.waitForResponse(
+      (r) => r.url().includes("/products") && r.request().method() === "GET",
+    );
     // 1. Navigate to the page
-    await page.goto("https://practicesoftwaretesting.com/");
+    await page.goto("/");
     await productsResponse;
 
     // 2. THE AUTH BARRICADE: Wait for Angular to process the token and update the header
@@ -80,16 +113,18 @@ test.describe("Home page with authentication", () => {
     );
 
     // 3. THE UI BARRICADE: Wait for the skeleton loaders to disappear and real products to render
-    const realProductCard = page.locator(".col-md-9 a.card", {has: page.locator('[data-test="product-name"]')}).first();
+    const realProductCard = page
+      .locator(".col-md-9 a.card", {
+        has: page.locator('[data-test="product-name"]'),
+      })
+      .first();
     await expect(realProductCard).toBeVisible();
   });
 
   test("Visual test with authentication", async ({ page }) => {
-    // Playwright will now take the photo safely AFTER the user is logged in
-    // and the products are fully visible on the screen.
-    //await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("networkidle");
     await expect(page).toHaveScreenshot("home-page-with-auth.png", {
-      mask: [page.locator('[data-test="nav-menu-minh"]')],
+      mask: [page.locator('[data-test="nav-menu"]')],
       maskColor: "rgb(255 0 153 / 20%)",
     });
   });
@@ -101,4 +136,109 @@ test.describe("Home page with authentication", () => {
       "John Doe",
     );
   });
+
+  test("Validate product data is visible in UI from API", async ({ page }) => {
+    let products: any;
+    let apiUrl = process.env.API_URL;
+    await test.step("intercept /products", async () => {
+      await page.route(apiUrl + "/products**", async (route) => {
+        const response = await route.fetch();
+        products = await response.json();
+        route.continue();
+      });
+    });
+
+    await page.goto("/");
+
+    const productGrid = page.locator(".col-md-9");
+    await expect(productGrid).toBeVisible();
+    await expect(page.locator(".skeleton").first()).not.toBeVisible();
+
+    for (const product of products.data) {
+      await expect(productGrid).toContainText(product.name);
+      await expect(productGrid).toContainText(product.price.toString());
+    }
+  });
+});
+
+test("Validate product data is visible from modified API", async ({ page }) => {
+  let apiUrl = process.env.API_URL;
+  await test.step("overwrite /products", async () => {
+    await page.route(apiUrl + "/products**", async (route) => {
+      const response = await route.fetch();
+      const json = await response.json();
+      json.data[0]["name"] = "Mocked Product";
+      json.data[0]["price"] = 100000;
+      json.data[0]["in_stock"] = false;
+
+      await route.fulfill({ response, json });
+    });
+  });
+  await page.goto("/");
+
+  const productGrid = page.locator(".col-md-9");
+  await expect(productGrid.getByRole("link").first()).toContainText(
+    "Mocked Product",
+  );
+  await expect(productGrid.getByRole("link").first()).toContainText("100000");
+  await expect(productGrid.getByRole("link").first()).toContainText(
+    "Out of stock",
+  );
+});
+
+test("Validate brands by intercepting network data", async ({ page }) => {
+  let brands: any;
+  const apiUrl = process.env.API_URL;
+  await test.step("intercept /brands", async () => {
+    await page.route(apiUrl + "/brands", async (route) => {
+      const response = await route.fetch();
+      brands = await response.json();
+      route.continue();
+    });
+  });
+  await page.goto("/");
+
+  const productGrid = page.locator(".col-md-9");
+  await expect(productGrid).toBeVisible();
+  await expect(page.locator(".skeleton").first()).not.toBeVisible();
+
+  const brandFilterSection = page
+    .locator("fieldset")
+    .filter({ has: page.locator("legend", { hasText: "Brands" }) });
+
+  for (const brand of brands) {
+    await expect(brandFilterSection).toContainText(brand.name);
+  }
+});
+
+test("Validate categories render in UI by mocking", async ({ page }) => {
+  let categories: any;
+  const apiUrl = process.env.API_URL;
+
+  await test.step("intercept /categories", async () => {
+    await page.route(apiUrl + "/categories/tree", async (route) => {
+      const response = await route.fetch();
+      const json = await response.json();
+      categories = json.data;
+
+      json[0].name = "Mocked Category";
+      if (json[0].sub_categories && json[0].sub_categories.length > 0) {
+        json[0].sub_categories[0].name = "Mocked Subcategory";
+      }
+      await route.fulfill({ response, json });
+    });
+  });
+  await page.goto("/");
+
+  const productGrid = page.locator(".col-md-9");
+  await expect(productGrid).toBeVisible();
+  await expect(page.locator(".skeleton").first()).not.toBeVisible();
+
+  const categoryFilterSection = page
+    .locator("fieldset")
+    .filter({ has: page.locator("legend", { hasText: "Categories" }) })
+    .first();
+
+  await expect(categoryFilterSection).toContainText("Mocked Category");
+  await expect(categoryFilterSection).toContainText("Mocked Subcategory");
 });

@@ -1,6 +1,6 @@
 import { type Locator, type Page } from "@playwright/test";
 
-export class MessagePage {
+export class MessagesPage {
   readonly page: Page;
   readonly table: Locator;
   readonly firstDetailLink: Locator;

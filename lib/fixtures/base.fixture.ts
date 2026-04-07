@@ -6,7 +6,7 @@ import {
 
 import {
   test as consoleTest,
-  expect as consoleExpect
+  expect as consoleExpect,
 } from "@fixtures/console.fixture";
 
 export const test = mergeTests(pageTest, consoleTest);
