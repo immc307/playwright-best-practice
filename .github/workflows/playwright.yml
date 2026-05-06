@@ -31,6 +31,16 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
 
+      - name: Debug - Verify environment variables
+        run: |
+          echo "BASE_URL length: ${#BASE_URL}"
+          echo "API_URL length: ${#API_URL}"
+          if [ -z "$BASE_URL" ]; then echo "❌ BASE_URL is EMPTY — secret not found!"; else echo "✅ BASE_URL is set"; fi
+          if [ -z "$API_URL" ]; then echo "❌ API_URL is EMPTY — secret not found!"; else echo "✅ API_URL is set"; fi
+        env:
+          BASE_URL: ${{ secrets.BASE_URL }}
+          API_URL: ${{ secrets.API_URL }}
+
       - name: Run Playwright tests
         run: npx playwright test
         env:
