@@ -17,7 +17,7 @@
   "files.autoSave": "afterDelay",
   "screencastMode.onlyKeyboardShortcuts": true,
   "terminal.integrated.fontSize": 12,
-  "workbench.colorTheme": "Visual Studio Dark",
+  "workbench.colorTheme": "Monokai",
   "workbench.fontAliasing": "antialiased",
   "workbench.statusBar.visible": true,
   "liveServer.settings.root": "/docs",

@@ -12,6 +12,12 @@ dotenv.config({ path: path.resolve(__dirname, ".env") });
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
+  webServer: {
+    command: "npm run start:bagel",
+    port: 5173,
+    timeout: 120 * 1000,
+    reuseExistingServer: !process.env.CI,
+  },
   timeout: 30_000,
   globalTimeout: 10 * 60 * 1000,
   testDir: "./tests",

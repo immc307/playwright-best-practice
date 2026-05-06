@@ -4,6 +4,8 @@
   "description": "Personal Playwright E2E test automation project by MC307.",
   "main": "index.js",
   "scripts": {
+    "start:bagel": "cd bagel-shop && npm run start",
+    "install:bagel-shop": "cd bagel-shop && npm install",
     "test": "npx playwright test",
     "test:chromium": "npx playwright test --project chromium",
     "test:first": "npx playwright test --grep @first",
