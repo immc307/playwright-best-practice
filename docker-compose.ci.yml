@@ -36,6 +36,9 @@ services:
     image: testsmith/practice-software-testing-web
     ports:
       - "8091:80"
+      - "8000:81"
+    volumes:
+      - laravel-app-code:/var/www
     depends_on:
       - laravel-api
 
