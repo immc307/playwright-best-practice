@@ -21,6 +21,8 @@ export default defineConfig({
   timeout: 30_000,
   globalTimeout: 10 * 60 * 1000,
   testDir: "./tests",
+  /* On CI, only run bagel-shop tests (Toolshop is behind Cloudflare) */
+  testIgnore: process.env.CI ? [/auth/, /account/, /api/, /checkout/, /homepage/, /login/] : [],
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -48,13 +50,18 @@ export default defineConfig({
 
   /* Configure projects for major browsers */
   projects: [
-    {
-      name: "setup",
-      testMatch: /.*\.setup\.ts/,
-    },
+    /* Auth setup — skip on CI (Toolshop blocked by Cloudflare) */
+    ...(process.env.CI
+      ? []
+      : [
+          {
+            name: "setup" as const,
+            testMatch: /.*\.setup\.ts/,
+          },
+        ]),
     {
       name: "chromium",
-      dependencies: ["setup"],
+      dependencies: process.env.CI ? [] : ["setup"],
       use: {
         ...devices["Desktop Chrome"],
         permissions: ["clipboard-read", "geolocation"],
@@ -80,7 +87,7 @@ export default defineConfig({
     // },
     {
       name: "Mobile Safari",
-      dependencies: ["setup"],
+      dependencies: process.env.CI ? [] : ["setup"],
       use: { ...devices["iPhone 15 Pro Max"] },
     },
 
